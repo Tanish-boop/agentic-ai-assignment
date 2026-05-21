@@ -72,7 +72,10 @@ def execute_conversational_task(query: str, extracted_text: Optional[str] = None
     """
     Handles friendly conversational answering.
     """
-    client = get_client()
+    try:
+        client = get_client()
+    except ValueError:
+        return f"**[Demo Mode - API Key Missing]** Hello! I received your query: '{query}'. To run live tasks, please configure your GEMINI_API_KEY."
     context = ""
     if extracted_text:
         context = f"Context from uploaded file:\n{extracted_text}\n\n"
@@ -94,7 +97,17 @@ def execute_summarization_task(text: str) -> str:
     """
     Performs standard summarization returning 1-line, 3 bullets, and a 5-sentence summary.
     """
-    client = get_client()
+    try:
+        client = get_client()
+    except ValueError:
+        return (
+            "1-Line Summary:\n[Demo Mode] Simulated summary for the provided input text.\n\n"
+            "3 Bullet Points:\n- [Demo Mode] Key point 1: This is a placeholder bullet point.\n- [Demo Mode] Key point 2: Please configure your GEMINI_API_KEY for live processing.\n- [Demo Mode] Key point 3: All workflow logic is executing correctly.\n\n"
+            "5-Sentence Summary:\nThis is a simulated five-sentence summary paragraph. It is generated because the Gemini API key is not configured in the environment. "
+            "The system is running in offline demonstration mode. It extracts the structure and simulates the expected format. "
+            "Please configure GEMINI_API_KEY in the .env file to enable live AI responses. "
+            "This enables complete testing of all pipeline steps."
+        )
     prompt = (
         f"Summarize the following text. You MUST follow the exact format below, nothing else:\n\n"
         f"1-Line Summary:\n[Insert a 1-line summary here]\n\n"
@@ -113,7 +126,14 @@ def execute_sentiment_analysis_task(text: str) -> str:
     """
     Performs sentiment analysis, returning label, confidence, and one-line justification.
     """
-    client = get_client()
+    try:
+        client = get_client()
+    except ValueError:
+        return (
+            "Sentiment: Positive\n"
+            "Confidence: 0.95\n"
+            "Justification: [Demo Mode] This is a simulated sentiment analysis justification because the GEMINI_API_KEY is not configured."
+        )
     prompt = f"Analyze the sentiment of the following text:\n{text}"
     
     try:
@@ -155,7 +175,18 @@ def execute_code_explanation_task(code: str) -> str:
     """
     Explains code, detects bugs, and mentions time/space complexity.
     """
-    client = get_client()
+    try:
+        client = get_client()
+    except ValueError:
+        return (
+            "### Code Explanation\n"
+            "[Demo Mode] This is a simulated explanation of the provided code snippet. The orchestrator has routed the code successfully to the code explanation component.\n\n"
+            "### Detected Bugs & Vulnerabilities\n"
+            "No bugs detected in demo mode.\n\n"
+            "### Complexity Analysis\n"
+            "- **Time Complexity**: O(N)\n"
+            "- **Space Complexity**: O(1)"
+        )
     prompt = (
         f"Explain this code. You MUST include these sections in your explanation:\n\n"
         f"### Code Explanation\n[Detailed explanation of what the code does]\n\n"

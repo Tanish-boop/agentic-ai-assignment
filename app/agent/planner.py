@@ -73,31 +73,31 @@ def plan_task(
     Analyzes inputs to decide if they are ambiguous or ready.
     If ready, generates a step-by-step execution plan and estimates costs.
     """
-    client = get_client()
-    
-    context = ""
-    if extracted_text:
-        context += f"Uploaded file type: {file_type}\nExtracted text preview (first 1000 chars):\n{extracted_text[:1000]}\n\n"
-        
-    prompt = (
-        f"You are an Agentic Planner. Review the user's query and the context of the uploaded file:\n\n"
-        f"User Query: {query}\n"
-        f"{context}"
-        f"Determine if the user's intent is ambiguous. "
-        f"If they uploaded a file and wrote a vague query (e.g. 'here', 'process', 'look at this') or wrote nothing at all, "
-        f"you MUST mark is_ambiguous=true and provide a short, clear follow-up question asking for clarification. "
-        f"If the goal is clear, classify it into one of these task_types:\n"
-        f"- `image_pdf_ocr` (User wants text extraction only, or just uploaded document and said 'extract text')\n"
-        f"- `youtube_transcript` (User wants to fetch/parse a YouTube video's captions from a URL)\n"
-        f"- `conversation` (General chitchat, simple query, or QA on text without requiring summary/sentiment/code explanation)\n"
-        f"- `summarize` (User explicitly asked to summarize the content)\n"
-        f"- `sentiment` (User explicitly asked for sentiment analysis)\n"
-        f"- `code_explain` (User provided code and asked to explain, debug, or analyze complexity)\n"
-        f"- `audio_transcribe_summary` (User uploaded audio and wants transcription + summary)\n\n"
-        f"Return a structured plan with steps. Be precise."
-    )
-    
     try:
+        client = get_client()
+        
+        context = ""
+        if extracted_text:
+            context += f"Uploaded file type: {file_type}\nExtracted text preview (first 1000 chars):\n{extracted_text[:1000]}\n\n"
+            
+        prompt = (
+            f"You are an Agentic Planner. Review the user's query and the context of the uploaded file:\n\n"
+            f"User Query: {query}\n"
+            f"{context}"
+            f"Determine if the user's intent is ambiguous. "
+            f"If they uploaded a file and wrote a vague query (e.g. 'here', 'process', 'look at this') or wrote nothing at all, "
+            f"you MUST mark is_ambiguous=true and provide a short, clear follow-up question asking for clarification. "
+            f"If the goal is clear, classify it into one of these task_types:\n"
+            f"- `image_pdf_ocr` (User wants text extraction only, or just uploaded document and said 'extract text')\n"
+            f"- `youtube_transcript` (User wants to fetch/parse a YouTube video's captions from a URL)\n"
+            f"- `conversation` (General chitchat, simple query, or QA on text without requiring summary/sentiment/code explanation)\n"
+            f"- `summarize` (User explicitly asked to summarize the content)\n"
+            f"- `sentiment` (User explicitly asked for sentiment analysis)\n"
+            f"- `code_explain` (User provided code and asked to explain, debug, or analyze complexity)\n"
+            f"- `audio_transcribe_summary` (User uploaded audio and wants transcription + summary)\n\n"
+            f"Return a structured plan with steps. Be precise."
+        )
+        
         response = client.models.generate_content(
             model='gemini-2.5-flash',
             contents=prompt,

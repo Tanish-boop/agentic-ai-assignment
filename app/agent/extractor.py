@@ -71,7 +71,14 @@ def _ocr_pdf_fallback(file_path: str) -> Dict[str, Any]:
     """
     OCR Fallback: Renders PDF pages to images and sends them to Gemini for OCR.
     """
-    client = get_client()
+    try:
+        client = get_client()
+    except ValueError:
+        return {
+            "text": "[Demo Mode] Simulated OCR fallback text from scanned PDF. Configure GEMINI_API_KEY for live page rendering and OCR.",
+            "confidence": 0.85,
+            "method": "pdf_ocr_fallback_demo"
+        }
     doc = fitz.open(file_path)
     parts = []
     
@@ -128,7 +135,14 @@ def _ocr_image(file_path: str, mime_type: str) -> Dict[str, Any]:
     """
     Uses Gemini multimodal capabilities to perform OCR on images.
     """
-    client = get_client()
+    try:
+        client = get_client()
+    except ValueError:
+        return {
+            "text": "[Demo Mode] Simulated OCR text from image. To see live OCR content, configure your GEMINI_API_KEY.",
+            "confidence": 0.95,
+            "method": "image_ocr_demo"
+        }
     with open(file_path, "rb") as f:
         img_bytes = f.read()
         
@@ -168,7 +182,14 @@ def _transcribe_audio(file_path: str, mime_type: str) -> Dict[str, Any]:
     """
     Uses Gemini API to transcribe audio files.
     """
-    client = get_client()
+    try:
+        client = get_client()
+    except ValueError:
+        return {
+            "text": "[Demo Mode] Simulated transcription of audio file. Please configure GEMINI_API_KEY for live Whisper transcription.",
+            "confidence": 0.9,
+            "method": "audio_transcription_demo"
+        }
     with open(file_path, "rb") as f:
         audio_bytes = f.read()
         
