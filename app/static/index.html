@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Antigravity Multimodal Agent</title>
+    <title>Agentic Multimodal Processing System</title>
     <!-- Google Fonts: Outfit & Fira Code -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -18,30 +18,39 @@
         <aside class="sidebar-panel">
             <div class="sidebar-header">
                 <div class="logo">
-                    <i class="fa-solid fa-wand-magic-sparkles glowing-icon"></i>
-                    <span>Antigravity</span>
+                    <i class="fa-solid fa-diagram-project"></i>
+                    <span>AMPS Console</span>
                 </div>
-                <div class="tagline">Multimodal Agentic Processing</div>
+                <div class="tagline">Multimodal Processing Core</div>
+            </div>
+
+            <!-- Detected Intent Widget -->
+            <div class="widget-card intent-widget">
+                <div class="widget-title">
+                    <i class="fa-solid fa-fingerprint"></i>
+                    <span>Detected Intent</span>
+                </div>
+                <div class="intent-container" id="intent-container">
+                    <div class="empty-state-text">No intent detected yet.</div>
+                </div>
+            </div>
+
+            <!-- Execution Plan Panel -->
+            <div class="widget-card plan-widget">
+                <div class="widget-title">
+                    <i class="fa-solid fa-network-wired"></i>
+                    <span>Execution Plan</span>
+                </div>
+                <div class="plan-steps-container" id="plan-steps">
+                    <div class="empty-state-text">No active execution plan yet.</div>
+                </div>
             </div>
 
             <!-- Cost Estimator Widget -->
             <div class="widget-card cost-widget">
-                <div class="widget-title">
-                    <i class="fa-solid fa-chart-line"></i>
-                    <span>Plan Cost Estimator</span>
-                </div>
-                <div class="cost-value" id="cost-display">$0.000000</div>
-                <div class="cost-subtext">Estimated model & API costs</div>
-            </div>
-
-            <!-- Plan Execution Tracker -->
-            <div class="widget-card plan-widget">
-                <div class="widget-title">
-                    <i class="fa-solid fa-list-check"></i>
-                    <span>Active Execution Plan</span>
-                </div>
-                <div class="plan-steps-container" id="plan-steps">
-                    <div class="empty-state-text">No active execution plan yet. Upload a file or ask a question to start.</div>
+                <div class="cost-info">
+                    <span class="cost-label">Workflow Cost:</span>
+                    <span class="cost-value" id="cost-display">$0.000000</span>
                 </div>
             </div>
 
@@ -52,12 +61,13 @@
                     <span>Agent Execution Logs</span>
                 </div>
                 <div class="terminal-container" id="terminal-logs">
-                    <div class="terminal-line system-msg">[System] Ready to accept workflows.</div>
+                    <div class="terminal-line system-msg">[INFO] Ready to accept workflows.</div>
                 </div>
             </div>
             
             <div class="sidebar-footer">
-                <span>Session: <span id="session-id-display">None</span></span>
+                <div class="stack-text">FastAPI • OCR • Whisper • PyMuPDF • Gemini API</div>
+                <div class="session-meta">Session ID: <span id="session-id-display">None</span></div>
             </div>
         </aside>
 
@@ -65,12 +75,15 @@
         <main class="chat-workspace">
             <header class="workspace-header">
                 <div class="session-info">
-                    <h1 id="task-title">Conversational Workspace</h1>
-                    <p class="status-badge" id="status-badge">Idle</p>
+                    <div class="header-titles">
+                        <h1 id="task-title">Agentic Multimodal Processing System</h1>
+                        <p class="subtitle">Upload text, images, PDFs, or audio files for AI-assisted processing and workflow execution.</p>
+                    </div>
                 </div>
                 <div class="actions">
-                    <button class="btn btn-secondary" id="new-session-btn" title="Start New Session">
-                        <i class="fa-solid fa-arrows-rotate"></i> Reset Chat
+                    <span class="status-badge" id="status-badge">Idle</span>
+                    <button class="btn btn-secondary" id="new-session-btn" title="Reset Session">
+                        <i class="fa-solid fa-arrows-rotate"></i> Reset
                     </button>
                 </div>
             </header>
@@ -79,34 +92,23 @@
             <section class="chat-feed" id="chat-feed">
                 <!-- Landing Screen / Welcome View -->
                 <div class="welcome-container" id="welcome-view">
-                    <h2 class="animate-gradient-text">What can I do for you today?</h2>
-                    <p class="welcome-desc">Upload files (Images, PDFs, Audios) or type instructions. I will analyze the intent, draft a plan, estimate token costs, and execute tasks autonomously.</p>
+                    <h2 class="welcome-title">System Core Ready</h2>
+                    <p class="welcome-desc">Awaiting workflow command. Upload an asset or type instructions below to initialize processing.</p>
                     
-                    <div class="features-grid">
-                        <div class="feature-card">
-                            <i class="fa-solid fa-file-pdf feature-icon pdf-color"></i>
-                            <h3>Smart PDF & OCR</h3>
-                            <p>Extracts text from scanned or native PDFs. Falls back to page-by-page OCR when text is missing.</p>
-                        </div>
-                        <div class="feature-card">
-                            <i class="fa-solid fa-microphone feature-icon audio-color"></i>
-                            <h3>Audio Transcribe & Sum</h3>
-                            <p>Transcribes MP3, WAV, and M4A audio. Returns transcript, exact duration, and summaries.</p>
-                        </div>
-                        <div class="feature-card">
-                            <i class="fa-solid fa-code feature-icon code-color"></i>
-                            <h3>Code Analysis</h3>
-                            <p>Explains code functionality, identifies logic bugs, and analyzes Big-O complexities.</p>
-                        </div>
-                        <div class="feature-card">
-                            <i class="fa-solid fa-chart-pie feature-icon sentiment-color"></i>
-                            <h3>Summaries & Sentiment</h3>
-                            <p>Performs detailed summaries (3 bullet formats) or multi-label sentiment analysis with justifications.</p>
-                        </div>
+                    <div class="tasks-panel">
+                        <h3 class="tasks-panel-title"><i class="fa-solid fa-cubes"></i> Supported Tasks</h3>
+                        <ul class="tasks-list">
+                            <li><i class="fa-solid fa-file-invoice"></i> OCR & PDF Extraction</li>
+                            <li><i class="fa-solid fa-microphone-lines"></i> Audio Transcription</li>
+                            <li><i class="fa-solid fa-align-left"></i> Summarization</li>
+                            <li><i class="fa-solid fa-chart-simple"></i> Sentiment Analysis</li>
+                            <li><i class="fa-solid fa-code-branch"></i> Code Explanation</li>
+                            <li><i class="fa-brands fa-youtube"></i> YouTube Transcript Extraction</li>
+                        </ul>
                     </div>
 
                     <div class="sample-prompts">
-                        <h4>Try these examples:</h4>
+                        <h4>Command Execution Templates:</h4>
                         <div class="prompts-list">
                             <button class="prompt-chip" data-prompt="Analyze the sentiment of this: 'I absolutely love this product, it has changed my workflow completely! Highly recommend!'">Sentiment Analysis</button>
                             <button class="prompt-chip" data-prompt="https://www.youtube.com/watch?v=dQw4w9WgXcQ">YouTube Transcript</button>

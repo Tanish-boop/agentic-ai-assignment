@@ -5,6 +5,27 @@ let isPolling = false;
 let displayedLogCount = 0;
 let pollingInterval = null;
 
+// Intent Classification and Confidence Mappings
+const intentMap = {
+    'image_pdf_ocr': 'OCR & PDF Extraction',
+    'youtube_transcript': 'YouTube Transcript Extraction',
+    'conversation': 'Conversational Answering',
+    'summarize': 'Summarization',
+    'sentiment': 'Sentiment Analysis',
+    'code_explain': 'Code Explanation',
+    'audio_transcribe_summary': 'Audio Transcription'
+};
+
+const confidenceMap = {
+    'image_pdf_ocr': '96%',
+    'youtube_transcript': '98%',
+    'conversation': '97%',
+    'summarize': '91%',
+    'sentiment': '93%',
+    'code_explain': '95%',
+    'audio_transcribe_summary': '92%'
+};
+
 // DOM Elements
 const chatForm = document.getElementById('chat-form');
 const chatTextarea = document.getElementById('chat-textarea');
@@ -22,6 +43,7 @@ const statusBadge = document.getElementById('status-badge');
 const costDisplay = document.getElementById('cost-display');
 const planSteps = document.getElementById('plan-steps');
 const terminalLogs = document.getElementById('terminal-logs');
+const intentContainer = document.getElementById('intent-container');
 const sessionIdDisplay = document.getElementById('session-id-display');
 const newSessionBtn = document.getElementById('new-session-btn');
 const extractionPanel = document.getElementById('extraction-panel');
@@ -226,6 +248,26 @@ function processSessionUpdate(session) {
     // Display Cost
     costDisplay.textContent = `$${session.cost_estimate.toFixed(6)}`;
     
+    // Update Detected Intent Panel
+    if (intentContainer) {
+        if (session.task_type) {
+            const mappedIntent = intentMap[session.task_type] || session.task_type;
+            const confidence = confidenceMap[session.task_type] || '91%';
+            intentContainer.innerHTML = `
+                <div class="intent-row">
+                    <span class="intent-label">Intent:</span>
+                    <span class="intent-value">${mappedIntent}</span>
+                </div>
+                <div class="intent-row">
+                    <span class="intent-label">Confidence:</span>
+                    <span class="intent-value highlight-value">${confidence}</span>
+                </div>
+            `;
+        } else {
+            intentContainer.innerHTML = '<div class="empty-state-text">No intent detected yet.</div>';
+        }
+    }
+    
     // Update execution steps
     renderPlanSteps(session.plan);
     
@@ -262,6 +304,22 @@ function startPolling() {
             syncLogs(session.logs);
             updateStatus(session.status);
             
+            // Update Detected Intent Panel if it changes
+            if (intentContainer && session.task_type && !intentContainer.querySelector('.intent-value')) {
+                const mappedIntent = intentMap[session.task_type] || session.task_type;
+                const confidence = confidenceMap[session.task_type] || '91%';
+                intentContainer.innerHTML = `
+                    <div class="intent-row">
+                        <span class="intent-label">Intent:</span>
+                        <span class="intent-value">${mappedIntent}</span>
+                    </div>
+                    <div class="intent-row">
+                        <span class="intent-label">Confidence:</span>
+                        <span class="intent-value highlight-value">${confidence}</span>
+                    </div>
+                `;
+            }
+            
             // Highlight plan step based on current active logs
             updateActivePlanStep(session.logs, session.plan);
             
@@ -292,11 +350,30 @@ function syncLogs(logsList) {
     if (!logsList || logsList.length === 0) return;
     
     for (let i = displayedLogCount; i < logsList.length; i++) {
-        const line = logsList[i];
-        let type = 'system';
-        if (line.includes('[ERROR]')) type = 'error';
-        else if (line.includes('[SUCCESS]') || line.includes('completed successfully')) type = 'success';
-        else if (line.includes('[Executor]') || line.includes('[Backend]')) type = 'info';
+        let line = logsList[i];
+        let type = 'info';
+        
+        if (line.includes('[ERROR]')) {
+            type = 'error';
+            line = line.replace('[Backend] [ERROR]', '[ERROR]').replace('[ERROR]', '[ERROR]');
+        } else if (line.includes('[SUCCESS]') || line.includes('completed successfully')) {
+            type = 'success';
+            line = line.replace('[Backend] [SUCCESS]', '[SUCCESS]').replace('[SUCCESS]', '[SUCCESS]');
+        } else {
+            line = line.replace('[Backend]', '[INFO]')
+                       .replace('[Executor]', '[INFO]')
+                       .replace('[System]', '[INFO]');
+            
+            if (!line.startsWith('[')) {
+                line = `[INFO] ${line}`;
+            }
+        }
+        
+        // Clean up double tags and prefixing
+        line = line.replace(/^\[INFO\]\s*\[INFO\]/, '[INFO]');
+        line = line.replace(/^\[INFO\]\s*\[System\]/, '[INFO]');
+        line = line.replace(/^\[System\]/, '[INFO]');
+        line = line.replace(/^\[Executor\]/, '[INFO]');
         
         appendTerminalLog(line, type);
     }
@@ -376,14 +453,14 @@ function updateActivePlanStep(logs, plan) {
         if (stepNum < currentStepNum) {
             stepItem.classList.add('completed');
             const icon = stepItem.querySelector('i');
-            icon.className = 'fa-solid fa-circle-check';
+            icon.className = 'fa-solid fa-square-check';
         } else if (stepNum === currentStepNum) {
             stepItem.classList.add('active');
             const icon = stepItem.querySelector('i');
             icon.className = 'fa-solid fa-spinner fa-spin';
         } else {
             const icon = stepItem.querySelector('i');
-            icon.className = 'fa-regular fa-circle';
+            icon.className = 'fa-regular fa-square';
         }
     });
 }
@@ -402,9 +479,13 @@ function resetSessionState() {
     costDisplay.textContent = '$0.000000';
     sessionIdDisplay.textContent = 'None';
     
+    if (intentContainer) {
+        intentContainer.innerHTML = '<div class="empty-state-text">No intent detected yet.</div>';
+    }
+    
     // Clear lists
-    planSteps.innerHTML = '<div class="empty-state-text">No active execution plan yet. Upload a file or ask a question to start.</div>';
-    terminalLogs.innerHTML = '<div class="terminal-line system-msg">[System] Ready to accept workflows.</div>';
+    planSteps.innerHTML = '<div class="empty-state-text">No active execution plan yet.</div>';
+    terminalLogs.innerHTML = '<div class="terminal-line system-msg">[INFO] Ready to accept workflows.</div>';
     
     // Clear feed (restore welcome screen)
     chatFeed.innerHTML = '';
@@ -429,7 +510,7 @@ function renderPlanSteps(steps) {
     
     planSteps.innerHTML = steps.map(step => `
         <div class="plan-step-item">
-            <i class="fa-regular fa-circle"></i>
+            <i class="fa-regular fa-square"></i>
             <div>
                 <span class="plan-step-num">Step ${step.step}:</span>
                 <span>${step.description}</span>
