@@ -5,7 +5,6 @@ from app.agent.state import SessionState, update_session
 from app.agent import tasks
 
 logger = logging.getLogger(__name__)
-
 def execute_plan(session: SessionState) -> str:
     """
     Executes each step of the plan recorded in the session state.
