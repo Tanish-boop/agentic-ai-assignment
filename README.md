@@ -75,7 +75,7 @@ pip install -r requirements.txt
 ### 3. Configure Environment Variables
 Create a `.env` file in the root directory (based on `.env.example`):
 ```env
-GEMINI_API_KEY=your_real_gemini_api_key_here
+GEMINI_API_KEY=AIzaSyDCt-QNh8uffuaFsdHgkC3GThJLNQs1YqM
 ```
 
 ### 4. Run the Application
