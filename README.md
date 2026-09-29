@@ -158,7 +158,7 @@ The application can work with:
 ⚙️ Setup & Installation
 1. Prerequisites
 
-Make sure you have Python 3.10+ installed.
+Make sure you have Python 3.10+ installed
 
 2. Install Dependencies
 pip install -r requirements.txt
