@@ -4,7 +4,7 @@ Multimodal Agent is an agentic AI application that accepts text, images, PDFs, a
 
 The system separates planning from execution, estimates LLM token and API costs, asks mandatory follow-up questions when a request is ambiguous, and provides a modern glassmorphic chat-style dashboard.
 
-🛡️ Screening Criteria Alignment
+🛡️ Screening Criteria Alignment.
 
 This project is designed to meet strict automated and human screening criteria with a strong focus on code quality, efficiency, orchestration, and reliability.
 
